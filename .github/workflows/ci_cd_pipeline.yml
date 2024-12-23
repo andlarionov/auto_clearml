@@ -48,7 +48,7 @@ jobs:
 
     - name: Train models
       run: |
-        python train_model.py
+        python scr/train_model.py
 
   report-notebook:
     runs-on: ubuntu-latest
