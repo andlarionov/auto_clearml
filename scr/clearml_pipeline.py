@@ -1,15 +1,5 @@
-import os
+from clearml import Task
 from clearml.automation import PipelineController
-
-# Проверка наличия ключей ClearML в переменных окружения
-access_key = os.getenv("CLEARML_API_ACCESS_KEY")
-secret_key = os.getenv("CLEARML_API_SECRET_KEY")
-
-if not access_key or not secret_key:
-    raise EnvironmentError("ClearML API keys are not set in the environment variables")
-
-print(f"Access Key: {access_key}")
-print(f"Secret Key: {secret_key}")
 
 # Инициализация пайплайна
 pipeline = PipelineController(
@@ -19,7 +9,7 @@ pipeline = PipelineController(
 )
 
 # Шаг 1: Обработка данных
-pipeline.add_step(
+data_processing_task = pipeline.add_step(
     name="data_processing",
     base_task_project="Discount Prediction",
     base_task_name="Data Processing",
@@ -29,16 +19,22 @@ pipeline.add_step(
     }
 )
 
+# Установка очереди для задачи обработки данных
+data_processing_task.set_base_task_queue('default')
+
 # Шаг 2: Обучение моделей
-pipeline.add_step(
+train_models_task = pipeline.add_step(
     name="train_models",
     base_task_project="Discount Prediction",
-    base_task_name="Train Models",
+    base_task_name="Model Training and Comparison",
     parents=["data_processing"],
     parameter_override={
         "Input/data_path": "data/df.csv"
     }
 )
+
+# Установка очереди для задачи обучения моделей
+train_models_task.set_base_task_queue('default')
 
 # Запуск пайплайна
 pipeline.start()
