@@ -107,6 +107,11 @@ jobs:
         pip install -r requirements.txt
         pip install clearml  # Устанавливаем ClearML, если он еще не установлен
 
+    - name: Set ClearML API keys as environment variables
+      run: |
+        echo "CLEARML_API_ACCESS_KEY=${{ secrets.CLEARML_API_ACCESS_KEY }}" >> $GITHUB_ENV
+        echo "CLEARML_API_SECRET_KEY=${{ secrets.CLEARML_API_SECRET_KEY }}" >> $GITHUB_ENV
+
     - name: Run ClearML Pipeline
       run: |
         python scr/clearml_pipeline.py  # Указываем путь к вашему скрипту, который запускает pipeline
