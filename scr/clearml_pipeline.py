@@ -1,4 +1,15 @@
+import os
 from clearml.automation import PipelineController
+
+# Проверка наличия ключей ClearML в переменных окружения
+access_key = os.getenv("CLEARML_API_ACCESS_KEY")
+secret_key = os.getenv("CLEARML_API_SECRET_KEY")
+
+if not access_key or not secret_key:
+    raise EnvironmentError("ClearML API keys are not set in the environment variables")
+
+print(f"Access Key: {access_key}")
+print(f"Secret Key: {secret_key}")
 
 # Инициализация пайплайна
 pipeline = PipelineController(
