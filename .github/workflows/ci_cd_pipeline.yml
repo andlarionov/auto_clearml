@@ -26,13 +26,7 @@ jobs:
 
     - name: Prepare data
       run: |
-        mkdir -p data
-        python data_create.py
-
-    - name: Save prepared data to artifacts
-      run: |
-        mkdir -p artifacts
-        cp -r data artifacts/prepared_data
+        python scr/data_create.py
 
   train-models:
     runs-on: ubuntu-latest
@@ -54,13 +48,7 @@ jobs:
 
     - name: Train models
       run: |
-        mkdir -p models
         python train_model.py
-
-    - name: Save trained models to artifacts
-      run: |
-        mkdir -p artifacts
-        cp -r models artifacts/trained_models
 
   report-notebook:
     runs-on: ubuntu-latest
@@ -82,8 +70,15 @@ jobs:
 
     - name: Execute notebook
       run: |
-        mkdir -p artifacts/reports
-        jupyter nbconvert --to notebook --execute notebooks/analysis.ipynb --output artifacts/reports/analysis_executed.ipynb
+        jupyter nbconvert --to notebook --execute notebooks/analysis.ipynb --output reports/analysis_executed.ipynb
+
+  commit-and-push-artifacts:
+    runs-on: ubuntu-latest
+    needs: report-notebook
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
 
     - name: Commit and push artifacts
       run: |
@@ -92,3 +87,26 @@ jobs:
         git add artifacts/
         git commit -m "Add artifacts from CI/CD pipeline"
         git push origin main
+
+  run-clearml-pipeline:
+    runs-on: ubuntu-latest
+    needs: commit-and-push-artifacts
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.8
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install clearml  # Устанавливаем ClearML, если он еще не установлен
+
+    - name: Run ClearML Pipeline
+      run: |
+        python scr/clearml_pipeline.py  # Указываем путь к вашему скрипту, который запускает pipeline
