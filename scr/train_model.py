@@ -6,7 +6,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import f1_score
 import joblib
 import matplotlib.pyplot as plt
-from clearml import Task, Logger
+from clearml import Task
 
 # Инициализация ClearML Task
 task = Task.init(project_name="Discount Prediction", task_name="Model Training and Comparison")
@@ -57,11 +57,11 @@ model_1.fit(X_train, y_train)
 # Предсказание и метрика для первой модели
 y_pred_1 = model_1.predict(X_test)
 f1_1 = f1_score(y_test, y_pred_1)
-Logger.current_logger().report_scalar("F1 Score", "Model 1", iteration=1, value=f1_1)
+task.get_logger().report_scalar("F1 Score", "Model 1", iteration=1, value=f1_1)
 
 # Сохранение первой модели
 joblib.dump(model_1, 'models/model_1.pkl')
-Logger.current_logger().report_artifact("model_1.pkl")
+task.upload_artifact(name="model_1.pkl", artifact_object='models/model_1.pkl')
 
 # Параметры второй модели
 model_params_2 = {
@@ -81,11 +81,11 @@ model_2.fit(X_train, y_train)
 # Предсказание и метрика для второй модели
 y_pred_2 = model_2.predict(X_test)
 f1_2 = f1_score(y_test, y_pred_2)
-Logger.current_logger().report_scalar("F1 Score", "Model 2", iteration=2, value=f1_2)
+task.get_logger().report_scalar("F1 Score", "Model 2", iteration=2, value=f1_2)
 
 # Сохранение второй модели
 joblib.dump(model_2, 'models/model_2.pkl')
-Logger.current_logger().report_artifact("model_2.pkl")
+task.upload_artifact(name="model_2.pkl", artifact_object='models/model_2.pkl')
 
 # Параметры третьей модели
 model_params_3 = {
@@ -105,11 +105,11 @@ model_3.fit(X_train, y_train)
 # Предсказание и метрика для третьей модели
 y_pred_3 = model_3.predict(X_test)
 f1_3 = f1_score(y_test, y_pred_3)
-Logger.current_logger().report_scalar("F1 Score", "Model 3", iteration=3, value=f1_3)
+task.get_logger().report_scalar("F1 Score", "Model 3", iteration=3, value=f1_3)
 
 # Сохранение третьей модели
 joblib.dump(model_3, 'models/model_3.pkl')
-Logger.current_logger().report_artifact("model_3.pkl")
+task.upload_artifact(name="model_3.pkl", artifact_object='models/model_3.pkl')
 
 # Данные для графика
 models = ['Model 1', 'Model 2', 'Model 3']
@@ -120,18 +120,15 @@ plt.ylabel('F1 Score')
 plt.title('Comparison of Model Performance')
 plt.savefig('performance_comparison.png')
 
-# Логируем график в ClearML
-Logger.current_logger().report_image(
-    title="Model Performance Comparison", series="F1 Score", local_path='performance_comparison.png'
-)
+# Логируем график как артефакт в ClearML
+task.upload_artifact(name="performance_comparison.png", artifact_object='performance_comparison.png')
 
 # Логируем текстовый отчет о производительности моделей
-with open('model_performance_report.txt', 'w') as f:
-    f.write(f"F1-score Model 1: {f1_1}\n")
-    f.write(f"F1-score Model 2: {f1_2}\n")
-    f.write(f"F1-score Model 3: {f1_3}\n")
+performance_report = f"F1-score Model 1: {f1_1}\nF1-score Model 2: {f1_2}\nF1-score Model 3: {f1_3}"
 
-Logger.current_logger().report_text("Model Performance Report", open('model_performance_report.txt').read())
+# Логируем текстовый отчет в ClearML
+task.get_logger().report_text(performance_report)
+
 
 print(f"F1-score Model 1: {f1_1}")
 print(f"F1-score Model 2: {f1_2}")
