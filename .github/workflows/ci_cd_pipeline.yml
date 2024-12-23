@@ -113,5 +113,8 @@ jobs:
         echo "CLEARML_API_SECRET_KEY=${{ secrets.CLEARML_API_SECRET_KEY }}" >> $GITHUB_ENV
 
     - name: Run ClearML Pipeline
+      env:
+        CLEARML_API_ACCESS_KEY: ${{ secrets.CLEARML_API_ACCESS_KEY }}
+        CLEARML_API_SECRET_KEY: ${{ secrets.CLEARML_API_SECRET_KEY }}
       run: |
         python scr/clearml_pipeline.py  # Указываем путь к вашему скрипту, который запускает pipeline
