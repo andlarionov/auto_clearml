@@ -12,10 +12,6 @@ from clearml import Task
 # Инициализация ClearML Task
 task = Task.init(project_name="Discount Prediction", task_name="Model Training and Comparison")
 
-# Создаем папки для артефактов и отчетов, если они не существуют
-artifacts_dir = 'artifacts'
-reports_dir = 'reports'
-
 # Открываем файл
 df = pd.read_csv('data/df.csv')
 
@@ -65,7 +61,7 @@ f1_1 = f1_score(y_test, y_pred_1)
 task.get_logger().report_scalar("F1 Score", "Model 1", iteration=1, value=f1_1)
 
 # Сохранение первой модели и логирование артефакта
-model_1_filepath = os.path.join(artifacts_dir, 'model_1.pkl')
+model_1_filepath = os.path.join('models', 'model_1.pkl')
 joblib.dump(model_1, model_1_filepath)
 task.upload_artifact(name="model_1.pkl", artifact_object=model_1_filepath)
 
@@ -90,7 +86,7 @@ f1_2 = f1_score(y_test, y_pred_2)
 task.get_logger().report_scalar("F1 Score", "Model 2", iteration=2, value=f1_2)
 
 # Сохранение второй модели и логирование артефакта
-model_2_filepath = os.path.join(artifacts_dir, 'model_2.pkl')
+model_2_filepath = os.path.join('models', 'model_2.pkl')
 joblib.dump(model_2, model_2_filepath)
 task.upload_artifact(name="model_2.pkl", artifact_object=model_2_filepath)
 
@@ -115,7 +111,7 @@ f1_3 = f1_score(y_test, y_pred_3)
 task.get_logger().report_scalar("F1 Score", "Model 3", iteration=3, value=f1_3)
 
 # Сохранение третьей модели и логирование артефакта
-model_3_filepath = os.path.join(artifacts_dir, 'model_3.pkl')
+model_3_filepath = os.path.join('models', 'model_3.pkl')
 joblib.dump(model_3, model_3_filepath)
 task.upload_artifact(name="model_3.pkl", artifact_object=model_3_filepath)
 
@@ -129,7 +125,7 @@ plt.ylabel('F1 Score')
 plt.title('Comparison of Model Performance')
 
 # Сохранение графика в папке reports
-plot_filepath = os.path.join(reports_dir, 'performance_comparison.png')
+plot_filepath = os.path.join('reports', 'performance_comparison.png')
 plt.savefig(plot_filepath)
 
 # Логируем график как артефакт в ClearML
@@ -137,7 +133,7 @@ task.upload_artifact(name="performance_comparison.png", artifact_object=plot_fil
 
 # Логируем текстовый отчет о производительности моделей в папку reports
 performance_report = f"F1-score Model 1: {f1_1}\nF1-score Model 2: {f1_2}\nF1-score Model 3: {f1_3}"
-report_filepath = os.path.join(reports_dir, 'performance_report.txt')
+report_filepath = os.path.join('reports', 'performance_report.txt')
 
 # Сохранение текста отчета
 with open(report_filepath, 'w') as report_file:
@@ -145,6 +141,7 @@ with open(report_filepath, 'w') as report_file:
 
 # Логируем текстовый отчет в ClearML
 task.get_logger().report_text(performance_report)
+
 
 # Завершение Task
 task.close()
